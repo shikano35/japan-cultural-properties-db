@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "japan-cultural-properties-db",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-03",
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "japan-cultural-properties-db",
+      "database_id": "REPLACE_WITH_YOUR_DATABASE_ID",
+      "migrations_dir": "drizzle"
+    }
+  ],
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}
