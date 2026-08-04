@@ -23,12 +23,7 @@ export default tseslint.config(
     extends: [tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
     languageOptions: {
       parserOptions: {
-        project: [
-          './tsconfig.src.json',
-          './tsconfig.node.json',
-          './tsconfig.openapi.json',
-          './test/tsconfig.json',
-        ],
+        project: ['./tsconfig.src.json', './tsconfig.node.json', './test/tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
