@@ -70,20 +70,49 @@ pnpm cf-typegen
 | `pnpm check`        | 上記の検証をまとめて実行（コミット前に推奨）               |
 | `pnpm cf-typegen`   | `wrangler.jsonc` から `worker-configuration.d.ts` を再生成 |
 
+### API
+
+| コマンド                | 内容                          |
+| ----------------------- | ----------------------------- |
+| `pnpm openapi:generate` | `openapi.json` を生成         |
+| `pnpm openapi:check`    | `openapi.json` が最新かを確認 |
+
+`openapi.json` は `src/` のスキーマから生成し、リポジトリにコミットする。ルートを変更したら `pnpm openapi:generate` を実行する。
+
+| エンドポイント                | 内容                   |
+| ----------------------------- | ---------------------- |
+| `GET /`                       | API の情報と出典       |
+| `GET /openapi.json`           | OpenAPI 仕様           |
+| `GET /docs`                   | Swagger UI             |
+| `GET /reference`              | Scalar                 |
+| `GET /properties`             | 文化財の一覧           |
+| `GET /properties/:id`         | 文化財の詳細           |
+| `GET /registers`              | 台帳                   |
+| `GET /heritage-types`         | 文化財種類             |
+| `GET /designation-categories` | 指定・登録区分         |
+| `GET /category-schemes`       | 分類体系               |
+| `GET /categories`             | 分類語彙               |
+| `GET /prefectures`            | 所在地の都道府県と件数 |
+
+件数は管理対象（棟・個体）単位。指定単位の件数は元データに識別子がないため提供しない。所在地の絞り込みは都道府県のみ。
+
 ### データベース操作
 
-| コマンド                 | 内容                                        |
-| ------------------------ | ------------------------------------------- |
-| `pnpm db:generate`       | スキーマ定義からマイグレーション SQL を生成 |
-| `pnpm db:migrate:local`  | ローカル D1 へマイグレーションを適用        |
-| `pnpm db:migrate:remote` | リモート（本番）D1 へマイグレーションを適用 |
-| `pnpm db:studio`         | Drizzle Studio（`.env` の設定が必要）       |
+| コマンド                     | 内容                                        |
+| ---------------------------- | ------------------------------------------- |
+| `pnpm db:generate`           | スキーマ定義からマイグレーション SQL を生成 |
+| `pnpm db:migrate:local`      | ローカル D1 へマイグレーションを適用        |
+| `pnpm db:migrate:remote`     | リモート（本番）D1 へマイグレーションを適用 |
+| `pnpm db:studio`             | Drizzle Studio（`.env` の設定が必要）       |
+| `pnpm etl:build`             | CSV から投入用 SQL を `.seed/` に生成       |
+| `pnpm etl:apply`             | `.seed/` をローカル D1 へ投入               |
+| `pnpm etl:apply -- --remote` | `.seed/` をリモート D1 へ投入               |
 
 スキーマ定義は `src/db/schema.ts`、生成されたマイグレーションは `drizzle/` に置かれ、リポジトリにコミットする。
 
 ## CI/CD
 
-- **CI**（`.github/workflows/ci.yml`）: `main` への push と全 PR で、format / lint / typecheck / test / build を実行。
+- **CI**（`.github/workflows/ci.yml`）: `main` への push と全 PR で、format / lint / typecheck / openapi / test / build を実行。
 - **Deploy**（`.github/workflows/deploy.yml`）: `workflow_dispatch` による手動実行のみ。
   `apply_migrations` を有効にすると、デプロイ前にリモート D1 へマイグレーションを適用する。
 
