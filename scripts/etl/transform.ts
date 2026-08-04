@@ -5,7 +5,7 @@ import {
   DESIGNATION_CATEGORIES,
   HERITAGE_TYPES,
   PREFECTURES,
-} from './master-data.ts'
+} from './master-data'
 
 // CSVの18列
 export interface Row {
@@ -151,7 +151,7 @@ function buildDesignations(row: Row, heritageTypeCode: string): Designation[] {
   const addByName = (name: string): void => {
     const code = DESIGNATION_CODE_BY_NAME.get(name)
     if (code === undefined) {
-      throw new Error(`未知の指定区分: ${name}（${row.heritageType} / ${row.name}）`)
+      throw new Error(`未知の指定区分: ${name} / ${row.heritageType} / ${row.name}`)
     }
     result.push(designation(code, row.icpDate))
   }

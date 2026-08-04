@@ -4,7 +4,11 @@
   "compilerOptions": {
     "types": ["@cloudflare/vitest-pool-workers/types"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+
+    // レスポンス JSON を動的に辿るため、テストに限りインデックスシグネチャの制約を外す
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false
   },
   "include": ["./**/*.ts", "../src/**/*.ts", "../worker-configuration.d.ts"]
 }

@@ -6,6 +6,7 @@ pnpm-lock.yaml
 # 生成物
 drizzle/
 worker-configuration.d.ts
+openapi.json
 
 # 元データ・レポート
 data/
