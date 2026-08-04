@@ -13,11 +13,7 @@ export function errorBody(code: ErrorCode, message: string): ErrorBody {
   return { error: { code, message } }
 }
 
-export function httpError(
-  status: ContentfulStatusCode,
-  code: ErrorCode,
-  message: string
-): HTTPException {
+function httpError(status: ContentfulStatusCode, code: ErrorCode, message: string): HTTPException {
   return new HTTPException(status, {
     res: Response.json(errorBody(code, message), { status }),
   })
