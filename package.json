@@ -25,6 +25,8 @@
     "db:migrate:local": "wrangler d1 migrations apply japan-cultural-properties-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply japan-cultural-properties-db --remote",
     "db:studio": "drizzle-kit studio",
+    "etl:build": "tsx scripts/etl/build-seed.ts",
+    "etl:apply": "tsx scripts/etl/apply-seed.ts",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "pnpm": {
