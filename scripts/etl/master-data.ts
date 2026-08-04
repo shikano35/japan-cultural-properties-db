@@ -6,7 +6,7 @@ export const SOURCE = {
   url: 'https://kunishitei.bunka.go.jp/bsys/index',
   termsUrl: 'https://www.mext.go.jp/b_menu/1351168.htm',
   licenseNote:
-    '文部科学省ウェブサイト利用規約（政府標準利用規約 第2.0版準拠 / CC BY 4.0 互換）に基づき、出典記載の上で文字情報を自由に利用可',
+    '文部科学省ウェブサイト利用規約に基づき、出典記載の上で文字情報を自由に利用可。CC BY 4.0 と互換',
   retrievedOn: '2026-08-04',
   processingNote:
     '完全重複行の除去、管理対象IDのゼロ埋め正規化、複数ファイルに跨る同一物件の統合、種別1/種別2 の分類体系への振り分け、指定年月日の指定エンティティへの展開、不正な座標の除外を行った加工済みデータ',
