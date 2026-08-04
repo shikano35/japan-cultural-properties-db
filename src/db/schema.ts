@@ -78,6 +78,7 @@ export const properties = sqliteTable(
     index('properties_heritage_type_idx').on(t.heritageTypeCode),
     index('properties_register_idx').on(t.registerCode),
     index('properties_name_idx').on(t.name),
+    index('properties_coordinates_idx').on(t.latitude, t.longitude),
   ]
 )
 

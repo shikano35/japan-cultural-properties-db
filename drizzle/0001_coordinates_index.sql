@@ -1,0 +1,1 @@
+CREATE INDEX `properties_coordinates_idx` ON `properties` (`latitude`,`longitude`);
