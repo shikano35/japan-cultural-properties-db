@@ -15,7 +15,7 @@ dist/
 node_modules/
 .wrangler
 
-# 生成物（`pnpm cf-typegen` で再生成できる）
+# 生成物
 worker-configuration.d.ts
 *.tsbuildinfo
 
@@ -41,3 +41,5 @@ lerna-debug.log*
 # レポート
 /report
 CLAUDE.md
+# ETL の生成物
+.seed/
