@@ -94,6 +94,20 @@ pnpm cf-typegen
 | `CLOUDFLARE_API_TOKEN`  | Cloudflare ダッシュボード > My Profile > API Tokens（`Edit Cloudflare Workers` + `D1 Edit` 権限） |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare ダッシュボード > Workers & Pages のアカウント ID                                       |
 
-## ライセンス
+## 出典とライセンス
 
-Apache-2.0（`LICENSE` 参照）。元データの利用条件は文化庁の[国指定文化財等データベース](https://kunishitei.bunka.go.jp/bsys/index)の規定に従うこと。
+本プロジェクトは文化庁が作成・提供するものではありません。 有志による非公式のデータベース／API です。
+
+### データ
+
+出典: [国指定文化財等データベース](https://kunishitei.bunka.go.jp/bsys/index)（文化庁）2026年8月4日取得
+
+同データベースの文字情報は[文部科学省ウェブサイト利用規約](https://www.mext.go.jp/b_menu/1351168.htm)に基づき、出典記載の上で自由に利用できます。同規約は政府標準利用規約（第2.0版）に準拠し、CC BY 4.0 と互換です。
+
+本プロジェクトでは元データに対し、重複行の除去・識別子の正規化・関係の分割といった加工を行っています。
+
+API のレスポンスにも出典情報を含めています。
+
+### コード
+
+Apache-2.0（`LICENSE` 参照）。このライセンスはコードにのみ適用され、データには適用されません。

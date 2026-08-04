@@ -1,3 +1,10 @@
+# 出典
+
+- 名称: 国指定文化財等データベース
+- 提供: 文化庁
+- URL: https://kunishitei.bunka.go.jp/bsys/index
+- 利用規約: https://www.mext.go.jp/b_menu/1351168.htm 
+
 # ダウンロード日
 
 2026/08/03
