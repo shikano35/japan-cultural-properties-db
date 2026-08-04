@@ -10,7 +10,8 @@
 | データベース       | Cloudflare D1 (SQLite)                     |
 | ORM                | Drizzle ORM / drizzle-kit                  |
 | API フレームワーク | Hono                                       |
-| バリデーション     | Valibot (`@hono/valibot-validator`)        |
+| バリデーション     | Valibot                                    |
+| API ドキュメント   | hono-openapi / Swagger UI / Scalar         |
 | 実行環境           | Cloudflare Workers                         |
 | Lint / Format      | ESLint (typescript-eslint) / Prettier      |
 | テスト             | Vitest + `@cloudflare/vitest-pool-workers` |
@@ -23,31 +24,83 @@
 
 - Node.js 24 以上（`.node-version` 参照）
 - pnpm 10 以上（`corepack enable pnpm` で有効化可）
-- Cloudflare アカウント
 
-### 手順
+ローカルで動かすだけなら Cloudflare アカウントは不要。デプロイする場合のみ「Cloudflare を使う場合の準備」を参照。
+
+### ローカル環境の構築
 
 ```sh
 git clone <this-repo>
 cd japan-cultural-properties-db
 
+make setup
+```
+
+`make setup` は依存関係のインストールからローカル D1 の作成、`data/` の CSV 投入までを行う。完了後 `make dev` で API が起動する。
+
+ローカル D1 は CSV から再生成されるため、`make setup` は何度実行しても問題なく、既存のローカル D1 は削除される。
+
+#### make が使えない環境の場合
+
+Windows など `make` が入っていない環境では、同じ内容を pnpm のコマンドで実行できる。下記のコマンドを順に実行する。
+
+```sh
 pnpm install
+pnpm db:migrate:local
+pnpm etl:build
+pnpm etl:apply
 ```
 
-### D1 データベースの作成
-
-`wrangler.jsonc` の `database_id` はプレースホルダのため、各環境で自分のデータベースを作成して差し替える。
+2 回目以降はローカル D1 を先に削除する。
 
 ```sh
-pnpm wrangler login
-pnpm wrangler d1 create japan-cultural-properties-db
+# PowerShell
+Remove-Item -Recurse -Force .wrangler\state\v3\d1
+
+# コマンドプロンプト
+rmdir /s /q .wrangler\state\v3\d1
 ```
 
-出力された `database_id` を `wrangler.jsonc` の `d1_databases[0].database_id` に設定し、型を再生成する。
+### Cloudflare を使う場合の準備
 
-```sh
-pnpm cf-typegen
-```
+デプロイやリモート D1 の操作を行う場合のみ必要。利用者側で以下を用意する。
+
+1. Cloudflare アカウント
+2. `wrangler` でのログイン
+
+   ```sh
+   pnpm wrangler login
+   ```
+
+3. D1 データベースの作成
+
+   ```sh
+   pnpm wrangler d1 create japan-cultural-properties-db
+   ```
+
+   `wrangler.jsonc` にコミットされている `database_id` は元の開発環境のものなので、出力された ID で `d1_databases[0].database_id` を置き換える。置き換え後に型を再生成する。
+
+   ```sh
+   pnpm cf-typegen
+   ```
+
+4. リモート D1 へのマイグレーションとデータ投入
+
+   ```sh
+   pnpm db:migrate:remote
+   pnpm etl:build
+   pnpm etl:apply -- --remote
+   ```
+
+5. デプロイ
+
+   ```sh
+   pnpm run deploy
+   ```
+
+   `deploy` は pnpm 組み込みのコマンドと名前が衝突するため `pnpm run` を付ける。
+
+`.env` は Drizzle Studio を使う場合にのみ必要。設定すると wrangler がアカウントの指定に使うため、値が誤っているとリモート D1 の操作が認可エラーになる。
 
 ### 元データ（CSV）
 
@@ -55,6 +108,18 @@ pnpm cf-typegen
 更新する場合は[国指定文化財等データベース](https://kunishitei.bunka.go.jp/bsys/index)の各分類の検索結果画面から CSV をダウンロードして差し替える。
 
 ## 開発
+
+| コマンド       | 内容                                                  |
+| -------------- | ----------------------------------------------------- |
+| `make help`    | 利用できるターゲットの一覧                            |
+| `make setup`   | 依存関係のインストールとローカル D1 の構築            |
+| `make db`      | ローカル D1 を作り直してデータを投入                  |
+| `make migrate` | ローカル D1 にマイグレーションを適用                  |
+| `make seed`    | CSV からローカル D1 へデータを投入                    |
+| `make dev`     | 開発サーバーを起動                                    |
+| `make check`   | 整形・Lint・型・OpenAPI・テスト・ビルドをまとめて検証 |
+
+個別の pnpm コマンドは以下。
 
 | コマンド            | 内容                                                       |
 | ------------------- | ---------------------------------------------------------- |

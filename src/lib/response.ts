@@ -28,9 +28,3 @@ export async function loadSource(db: Db): Promise<SourceMeta> {
     note: NOTE,
   }
 }
-
-export interface Page {
-  total: number
-  limit: number
-  offset: number
-}

@@ -4,8 +4,7 @@
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "types": ["node"]
+    "types": ["node", "./worker-configuration.d.ts"]
   },
-  "include": ["scripts/**/*.ts", "drizzle.config.ts", "vitest.config.ts"],
-  "exclude": ["scripts/openapi/**/*.ts"]
+  "include": ["scripts/**/*.ts", "src/**/*.ts", "drizzle.config.ts", "vitest.config.ts"]
 }
