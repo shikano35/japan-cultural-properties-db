@@ -1,15 +1,58 @@
 {
   "name": "japan-cultural-properties-db",
+  "version": "0.1.0",
+  "private": true,
   "type": "module",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
+    "prepare": "wrangler types --env-interface CloudflareBindings",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir dist",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc -b tsconfig.json && tsc --noEmit -p test/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply japan-cultural-properties-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply japan-cultural-properties-db --remote",
+    "db:studio": "drizzle-kit studio",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
   },
   "dependencies": {
-    "hono": "^4.12.34"
+    "@hono/valibot-validator": "^0.6.1",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.34",
+    "valibot": "^1.4.2"
   },
   "devDependencies": {
-    "wrangler": "^4.110.0"
+    "@cloudflare/vitest-pool-workers": "^0.20.1",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.1.2",
+    "csv-parse": "^7.0.2",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.5",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.118.0"
   }
 }
