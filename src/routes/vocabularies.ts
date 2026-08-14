@@ -6,11 +6,16 @@ import { createDb } from '../db/client'
 import {
   categories,
   categorySchemes,
+  CRITERION_KINDS,
   designationCategories,
+  designationCriteria,
   DESIGNATION_TIERS,
+  detailFields,
   heritageTypes,
   HERITAGE_GROUPS,
   places,
+  propertyDesignationCriteria,
+  propertyDetails,
   propertyPlaces,
   registers,
 } from '../db/schema'
@@ -66,6 +71,20 @@ const categorySchema = v.object({
 })
 
 const prefectureSchema = v.object({ name: v.string(), count: v.number() })
+
+const designationCriterionSchema = v.object({
+  id: v.number(),
+  kind: v.picklist(CRITERION_KINDS),
+  text: v.string(),
+  count: v.number(),
+})
+
+const detailFieldSchema = v.object({
+  code: v.string(),
+  name: v.string(),
+  appliesTo: v.string(),
+  count: v.number(),
+})
 
 vocabularyRoutes.get('/registers', describeList('台帳の一覧', registerSchema), async (c) => {
   const db = createDb(c.env.DB)
@@ -155,6 +174,55 @@ vocabularyRoutes.get(
         .where(sql`${propertyPlaces.role} = 'location' and ${isNotNull(places.prefecture)}`)
         .groupBy(places.prefecture)
         .orderBy(asc(places.prefecture)),
+      loadSource(db),
+    ])
+    return c.json({ data, meta: { total: data.length, source } })
+  }
+)
+
+vocabularyRoutes.get(
+  '/designation-criteria',
+  describeList('指定・登録・選択・選定基準の一覧', designationCriterionSchema),
+  async (c) => {
+    const db = createDb(c.env.DB)
+    const [data, source] = await Promise.all([
+      db
+        .select({
+          id: designationCriteria.id,
+          kind: designationCriteria.kind,
+          text: designationCriteria.text,
+          count: sql<number>`count(${propertyDesignationCriteria.propertyId})`,
+        })
+        .from(designationCriteria)
+        .leftJoin(
+          propertyDesignationCriteria,
+          eq(propertyDesignationCriteria.criterionId, designationCriteria.id)
+        )
+        .groupBy(designationCriteria.id)
+        .orderBy(asc(designationCriteria.kind), asc(designationCriteria.id)),
+      loadSource(db),
+    ])
+    return c.json({ data, meta: { total: data.length, source } })
+  }
+)
+
+vocabularyRoutes.get(
+  '/detail-fields',
+  describeList('文化財種類ごとの記述項目の一覧', detailFieldSchema),
+  async (c) => {
+    const db = createDb(c.env.DB)
+    const [data, source] = await Promise.all([
+      db
+        .select({
+          code: detailFields.code,
+          name: detailFields.name,
+          appliesTo: detailFields.appliesTo,
+          count: sql<number>`count(${propertyDetails.propertyId})`,
+        })
+        .from(detailFields)
+        .leftJoin(propertyDetails, eq(propertyDetails.fieldCode, detailFields.code))
+        .groupBy(detailFields.code)
+        .orderBy(asc(detailFields.displayOrder)),
       loadSource(db),
     ])
     return c.json({ data, meta: { total: data.length, source } })
