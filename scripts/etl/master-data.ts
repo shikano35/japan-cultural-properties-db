@@ -1,4 +1,5 @@
 /** CSVに現れない語彙とコード体系の定義。 */
+export const DETAIL_RETRIEVED_ON = '2026-08-14'
 
 export const SOURCE = {
   name: '国指定文化財等データベース',
@@ -9,7 +10,7 @@ export const SOURCE = {
     '文部科学省ウェブサイト利用規約に基づき、出典記載の上で文字情報を自由に利用可。CC BY 4.0 と互換',
   retrievedOn: '2026-08-04',
   processingNote:
-    '完全重複行の除去、管理対象IDのゼロ埋め正規化、複数ファイルに跨る同一物件の統合、種別1/種別2 の分類体系への振り分け、指定年月日の指定エンティティへの展開、不正な座標の除外を行った加工済みデータ',
+    '完全重複行の除去、管理対象IDのゼロ埋め正規化、複数ファイルに跨る同一物件の統合、種別1/種別2 の分類体系への振り分け、指定年月日の指定エンティティへの展開、不正な座標の除外を行った加工済みデータ。ふりがな、員数、年代、解説文、指定基準などは詳細ページから取得し、特別史跡等の指定年月日は基の指定と特別指定に分けている',
 } as const
 
 export const REGISTERS: readonly { code: string; name: string }[] = [
@@ -255,4 +256,125 @@ export const PREFECTURES: readonly string[] = [
   '宮崎県',
   '鹿児島県',
   '沖縄県',
+]
+
+export const DETAIL_FIELDS: readonly {
+  code: string
+  name: string
+  appliesTo: string
+  displayOrder: number
+}[] = [
+  {
+    code: 'treasure_class',
+    name: '国宝・重文区分',
+    appliesTo: '国宝・重要文化財',
+    displayOrder: 10,
+  },
+  {
+    code: 'structure',
+    name: '構造及び形式等',
+    appliesTo: '建造物および登録有形文化財（建造物）',
+    displayOrder: 20,
+  },
+  {
+    code: 'foundation',
+    name: '創建及び沿革',
+    appliesTo: '国宝・重要文化財（建造物）',
+    displayOrder: 30,
+  },
+  {
+    code: 'building_note',
+    name: '棟礼、墨書、その他参考となるべき事項',
+    appliesTo: '国宝・重要文化財（建造物）',
+    displayOrder: 40,
+  },
+  { code: 'author', name: '作者', appliesTo: '美術工芸品および登録美術品', displayOrder: 50 },
+  {
+    code: 'dimensions',
+    name: '寸法・重量',
+    appliesTo: '美術工芸品および登録美術品',
+    displayOrder: 60,
+  },
+  { code: 'material_form', name: '品質・形状', appliesTo: '美術工芸品', displayOrder: 70 },
+  { code: 'stage_direction', name: 'ト書', appliesTo: '美術工芸品', displayOrder: 80 },
+  {
+    code: 'inscription',
+    name: '画賛・奥書・銘文等',
+    appliesTo: '美術工芸品',
+    displayOrder: 90,
+  },
+  {
+    code: 'production_period',
+    name: '制作時期',
+    appliesTo: '登録美術品',
+    displayOrder: 100,
+  },
+  {
+    code: 'exhibition_venue',
+    name: '公開契約館の名称',
+    appliesTo: '登録美術品',
+    displayOrder: 110,
+  },
+  {
+    code: 'provenance',
+    name: '伝来・その他参考となるべき事項',
+    appliesTo: '美術工芸品および登録美術品',
+    displayOrder: 120,
+  },
+  {
+    code: 'other_note',
+    name: 'その他参考となるべき事項',
+    appliesTo: '民俗文化財、無形文化財、記念物ほか',
+    displayOrder: 130,
+  },
+  {
+    code: 'holder_certification_kind',
+    name: '認定区分',
+    appliesTo: '無形文化財および選定保存技術',
+    displayOrder: 140,
+  },
+  {
+    code: 'designation_kind',
+    name: '指名区分',
+    appliesTo: '記録作成等の措置を講ずべき無形文化財',
+    displayOrder: 150,
+  },
+  { code: 'special_kind', name: '特別区分', appliesTo: '史跡名勝天然記念物', displayOrder: 160 },
+  { code: 'components', name: '構成資産', appliesTo: '世界遺産', displayOrder: 170 },
+  {
+    code: 'world_heritage_criterion_1',
+    name: '世界遺産の登録基準1',
+    appliesTo: '世界遺産',
+    displayOrder: 181,
+  },
+  {
+    code: 'world_heritage_criterion_2',
+    name: '世界遺産の登録基準2',
+    appliesTo: '世界遺産',
+    displayOrder: 182,
+  },
+  {
+    code: 'world_heritage_criterion_3',
+    name: '世界遺産の登録基準3',
+    appliesTo: '世界遺産',
+    displayOrder: 183,
+  },
+  {
+    code: 'world_heritage_criterion_4',
+    name: '世界遺産の登録基準4',
+    appliesTo: '世界遺産',
+    displayOrder: 184,
+  },
+  {
+    code: 'world_heritage_criterion_5',
+    name: '世界遺産の登録基準5',
+    appliesTo: '世界遺産',
+    displayOrder: 185,
+  },
+  {
+    code: 'world_heritage_criterion_6',
+    name: '世界遺産の登録基準6',
+    appliesTo: '世界遺産',
+    displayOrder: 186,
+  },
 ]

@@ -41,5 +41,6 @@ lerna-debug.log*
 # レポート
 /report
 CLAUDE.md
-# ETL の生成物
+# ETL
 .seed/
+.crawl/
