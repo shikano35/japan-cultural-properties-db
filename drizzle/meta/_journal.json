@@ -15,6 +15,13 @@
       "when": 1785847784251,
       "tag": "0001_coordinates_index",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786556396667,
+      "tag": "0002_detail_fields",
+      "breakpoints": true
     }
   ]
 }
