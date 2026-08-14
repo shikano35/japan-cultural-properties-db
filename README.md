@@ -107,17 +107,30 @@ rmdir /s /q .wrangler\state\v3\d1
 元データは `data/` 配下にリポジトリへ含めている。ファイルの一覧と件数、取得日は `data/data.md` を参照。
 更新する場合は[国指定文化財等データベース](https://kunishitei.bunka.go.jp/bsys/index)の各分類の検索結果画面から CSV をダウンロードして差し替える。
 
+### 詳細ページ
+
+CSV の 18 列は元データの一部で、ふりがな・員数・年代・解説文・指定基準などは詳細ページにのみある。これらを含める場合は取得してから投入する。
+
+```sh
+pnpm crawl:fetch -- --limit 20   # 動作確認
+pnpm crawl:parse                 # 解析結果と未知の項目名を確認
+pnpm crawl:fetch                 # 全 37,182 件。待機 2 秒で約 27 時間
+make db                          # ローカル D1 を作り直して投入
+```
+
 ## 開発
 
-| コマンド       | 内容                                                  |
-| -------------- | ----------------------------------------------------- |
-| `make help`    | 利用できるターゲットの一覧                            |
-| `make setup`   | 依存関係のインストールとローカル D1 の構築            |
-| `make db`      | ローカル D1 を作り直してデータを投入                  |
-| `make migrate` | ローカル D1 にマイグレーションを適用                  |
-| `make seed`    | CSV からローカル D1 へデータを投入                    |
-| `make dev`     | 開発サーバーを起動                                    |
-| `make check`   | 整形・Lint・型・OpenAPI・テスト・ビルドをまとめて検証 |
+| コマンド           | 内容                                                  |
+| ------------------ | ----------------------------------------------------- |
+| `make help`        | 利用できるターゲットの一覧                            |
+| `make setup`       | 依存関係のインストールとローカル D1 の構築            |
+| `make db`          | ローカル D1 を作り直してデータを投入                  |
+| `make migrate`     | ローカル D1 にマイグレーションを適用                  |
+| `make seed`        | CSV と取得済みの詳細ページからローカル D1 へ投入      |
+| `make crawl`       | 詳細ページを取得                                      |
+| `make crawl-check` | 取得済みの詳細ページの解析結果を確認                  |
+| `make dev`         | 開発サーバーを起動                                    |
+| `make check`       | 整形・Lint・型・OpenAPI・テスト・ビルドをまとめて検証 |
 
 個別の pnpm コマンドは以下。
 
@@ -163,17 +176,21 @@ rmdir /s /q .wrangler\state\v3\d1
 
 ### データベース操作
 
-| コマンド                     | 内容                                        |
-| ---------------------------- | ------------------------------------------- |
-| `pnpm db:generate`           | スキーマ定義からマイグレーション SQL を生成 |
-| `pnpm db:migrate:local`      | ローカル D1 へマイグレーションを適用        |
-| `pnpm db:migrate:remote`     | リモート（本番）D1 へマイグレーションを適用 |
-| `pnpm db:studio`             | Drizzle Studio（`.env` の設定が必要）       |
-| `pnpm etl:build`             | CSV から投入用 SQL を `.seed/` に生成       |
-| `pnpm etl:apply`             | `.seed/` をローカル D1 へ投入               |
-| `pnpm etl:apply -- --remote` | `.seed/` をリモート D1 へ投入               |
+| コマンド                     | 内容                                                 |
+| ---------------------------- | ---------------------------------------------------- |
+| `pnpm db:generate`           | スキーマ定義からマイグレーション SQL を生成          |
+| `pnpm db:migrate:local`      | ローカル D1 へマイグレーションを適用                 |
+| `pnpm db:migrate:remote`     | リモート（本番）D1 へマイグレーションを適用          |
+| `pnpm db:studio`             | Drizzle Studio（`.env` の設定が必要）                |
+| `pnpm crawl:fetch`           | 詳細ページを取得（`--limit` / `--type` / `--delay`） |
+| `pnpm crawl:parse`           | 取得済み HTML の解析結果と未知の項目名を確認         |
+| `pnpm etl:build`             | CSV と詳細ページから投入用 SQL を `.seed/` に生成    |
+| `pnpm etl:apply`             | `.seed/` をローカル D1 へ投入                        |
+| `pnpm etl:apply -- --remote` | `.seed/` をリモート D1 へ投入                        |
 
 スキーマ定義は `src/db/schema.ts`、生成されたマイグレーションは `drizzle/` に置かれ、リポジトリにコミットする。
+
+全文検索用の `properties_fts` は FTS5 の仮想テーブルのため Drizzle のスキーマ定義に含まれず、`drizzle/0003_properties_fts.sql` で直接定義している。投入の最後に `rebuild` で構築する。
 
 ## CI/CD
 
