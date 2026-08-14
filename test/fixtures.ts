@@ -74,6 +74,54 @@ const STATEMENTS = [
      (1, 1, 'owner'),
      (2, 2, 'owner'),
      (4, 3, 'owner')`,
+
+  `UPDATE properties SET name_kana = 'いわきやまじんじゃ', quantity_text = '1棟',
+     era_text = '寛文7', year_text = '1667', year_from = 1667, year_to = 1667,
+     summary_text = '津軽の総鎮守として知られる神社', detail_text = '桜門は寛文年間の造営で、藤原氏の影響を受けた意匠を持つ',
+     has_photo = 1, has_attachment = 0, designation_number = '00123', detail_retrieved_on = '2026-08-14'
+     WHERE id = 1`,
+  `UPDATE properties SET name_kana = 'おおのやすまろどうばんぼし', quantity_text = '1枚',
+     year_text = '19世紀半ば', has_photo = 0, has_attachment = 0, detail_retrieved_on = '2026-08-14'
+     WHERE id = 2`,
+  `UPDATE properties SET name_kana = 'きゅうゆうびかんおよびていえん', area_text = '12.5 ha',
+     area_hectares = 12.5, summary_text = '仙台藩の学問所と庭園', has_photo = 1,
+     notification_number = '270', added_on = '1935-06-07', detail_retrieved_on = '2026-08-14'
+     WHERE id = 3`,
+
+  `INSERT INTO detail_fields (code, name, applies_to, display_order) VALUES
+     ('structure', '構造及び形式等', '建造物', 20),
+     ('author', '作者', '美術工芸品', 50)`,
+
+  `INSERT INTO property_details (property_id, field_code, value) VALUES
+     (1, 'structure', '桁行三間、梁間二間、一重、入母屋造'),
+     (2, 'author', '太安萬侶')`,
+
+  `INSERT INTO designation_criteria (id, kind, text) VALUES
+     (1, 'designation', '(一）意匠的に優秀なもの'),
+     (2, 'designation', '一．貝塚、集落跡、古墳その他この類の遺跡')`,
+
+  `INSERT INTO property_designation_criteria (property_id, criterion_id, slot) VALUES
+     (1, 1, 1),
+     (3, 2, 1)`,
+
+  `INSERT INTO property_attachments (id, property_id, name, quantity_text, ordinal) VALUES
+     (1, 1, '棟札', '2枚', 1),
+     (2, 1, '旧組高欄', '6組', 2)`,
+
+  `INSERT INTO actors (id, name, name_kana) VALUES (4, '岩木山神社保存会', 'いわきやまじんじゃほぞんかい')`,
+
+  `INSERT INTO property_holders (id, property_id, kind, actor_id, certified_on, date_precision, certification_round, ordinal) VALUES
+     (1, 1, 'group', 4, '1993-04-15', 'day', NULL, 1),
+     (2, 1, 'individual', NULL, '2002-07-08', 'day', '第3次', 2)`,
+
+  `INSERT INTO change_types (id, name) VALUES (1, '追加指定'), (2, '名称変更')`,
+
+  `INSERT INTO property_changes (id, property_id, changed_on, date_precision, source_date, content, ordinal) VALUES
+     (1, 3, '1935-06-07', 'day', '1935.06.07(昭和10.06.07)', NULL, 1)`,
+
+  `INSERT INTO property_change_types (change_id, type_id) VALUES (1, 1), (1, 2)`,
+
+  `INSERT INTO properties_fts(properties_fts) VALUES('rebuild')`,
 ]
 
 export const FIXTURE_COUNTS = {
@@ -84,6 +132,8 @@ export const FIXTURE_COUNTS = {
   categorySchemes: 2,
   categories: 2,
   prefectures: 3,
+  designationCriteria: 2,
+  detailFields: 2,
 } as const
 
 export async function seed(db: D1Database): Promise<void> {

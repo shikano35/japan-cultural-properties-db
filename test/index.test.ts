@@ -190,6 +190,73 @@ describe('GET /properties', () => {
   })
 })
 
+describe('GET /properties の検索と並び替え', () => {
+  it('解説文の語で全文検索できる', async () => {
+    const { body } = await getList('/properties?q=' + encodeURIComponent('藤原氏'))
+
+    expect(body.meta.total).toBe(1)
+    expect(body.data[0]?.id).toBe(1)
+  })
+
+  it('2文字以下は名称とふりがなの部分一致になる', async () => {
+    const { body } = await getList('/properties?q=' + encodeURIComponent('東照'))
+
+    expect(body.meta.total).toBe(1)
+    expect(body.data[0]?.name).toBe('東照宮')
+  })
+
+  it('ふりがなの前方一致で絞り込める', async () => {
+    const { body } = await getList('/properties?kana=' + encodeURIComponent('いわき'))
+
+    expect(body.meta.total).toBe(1)
+    expect(body.data[0]?.nameKana).toBe('いわきやまじんじゃ')
+  })
+
+  it('一覧にふりがなを含む', async () => {
+    const { body } = await getList('/properties?limit=100')
+
+    expect(body.data.find((p) => p.id === 1)?.nameKana).toBe('いわきやまじんじゃ')
+  })
+
+  it('西暦の範囲で絞り込める', async () => {
+    const inRange = await getList('/properties?yearFrom=1600&yearTo=1700')
+    const outOfRange = await getList('/properties?yearFrom=1800')
+
+    expect(inRange.body.meta.total).toBe(1)
+    expect(outOfRange.body.meta.total).toBe(0)
+  })
+
+  it('解説文の有無で絞り込める', async () => {
+    const withText = await getList('/properties?hasDescription=true')
+    const without = await getList('/properties?hasDescription=false')
+
+    expect(withText.body.meta.total).toBe(2)
+    expect(without.body.meta.total).toBe(FIXTURE_COUNTS.properties - 2)
+  })
+
+  it('指定基準で絞り込める', async () => {
+    const { body } = await getList('/properties?criterion=1')
+
+    expect(body.meta.total).toBe(1)
+    expect(body.data[0]?.id).toBe(1)
+  })
+
+  it('ふりがな順では値を持たないものが末尾に並ぶ', async () => {
+    const { body } = await getList('/properties?sort=nameKana&limit=100')
+    const kanaValues = body.data.map((p) => p.nameKana)
+    const firstNull = kanaValues.indexOf(null)
+
+    expect(kanaValues[0]).not.toBeNull()
+    expect(kanaValues.slice(firstNull).every((v) => v === null)).toBe(true)
+  })
+
+  it('西暦順でも値を持たないものが末尾に並ぶ', async () => {
+    const { body } = await getList('/properties?sort=year&order=desc&limit=100')
+
+    expect(body.data[0]?.id).toBe(1)
+  })
+})
+
 describe('GET /properties/:id', () => {
   it('詳細を返す', async () => {
     const { res, body } = await getDetail('/properties/1')
@@ -228,6 +295,70 @@ describe('GET /properties/:id', () => {
     expect(body.data.coordinateNote).toContain('日本の範囲外')
   })
 
+  it('詳細ページ由来の項目を返す', async () => {
+    const { body } = await getDetail('/properties/1')
+
+    expect(body.data).toMatchObject({
+      nameKana: 'いわきやまじんじゃ',
+      quantityText: '1棟',
+      eraText: '寛文7',
+      yearText: '1667',
+      yearFrom: 1667,
+      yearTo: 1667,
+      designationNumber: '00123',
+      hasPhoto: true,
+      hasAttachment: false,
+    })
+    expect(body.data.summaryText).toContain('津軽')
+    expect(body.data.details).toEqual([
+      {
+        field: { code: 'structure', name: '構造及び形式等' },
+        value: '桁行三間、梁間二間、一重、入母屋造',
+      },
+    ])
+    expect(body.data.criteria).toEqual([
+      { id: 1, kind: 'designation', slot: 1, text: '(一）意匠的に優秀なもの' },
+    ])
+    expect(body.data.attachments).toEqual([
+      { name: '棟札', quantityText: '2枚' },
+      { name: '旧組高欄', quantityText: '6組' },
+    ])
+  })
+
+  it('元データの詳細ページURLを返す', async () => {
+    const { body } = await getDetail('/properties/1')
+
+    expect(body.data.sourceUrl).toBe('https://kunishitei.bunka.go.jp/bsys/maindetails/102/85')
+  })
+
+  it('保持者は団体のみ名称を持ち、個人は氏名を持たない', async () => {
+    const { body } = await getDetail('/properties/1')
+    const group = body.data.holders.find((h) => h.kind === 'group')
+    const individual = body.data.holders.find((h) => h.kind === 'individual')
+
+    expect(group).toMatchObject({
+      name: '岩木山神社保存会',
+      nameKana: 'いわきやまじんじゃほぞんかい',
+    })
+    expect(individual).toMatchObject({ name: null, nameKana: null, certificationRound: '第3次' })
+  })
+
+  it('指定等後に行った措置は異動種別をまとめて返す', async () => {
+    const { body } = await getDetail('/properties/3')
+
+    const [change] = body.data.changes
+
+    expect(change).toMatchObject({ changedOn: '1935-06-07', datePrecision: 'day', content: null })
+    expect([...change.types].sort()).toEqual(['名称変更', '追加指定'])
+    expect(body.data.areaHectares).toBe(12.5)
+  })
+
+  it('指定には和暦を含む', async () => {
+    const { body } = await getDetail('/properties/1')
+
+    expect(body.data.designations[0]).toHaveProperty('japaneseEraDate')
+  })
+
   it('存在しないidは404を返す', async () => {
     const { res, body } = await getError('/properties/99999999')
 
@@ -248,6 +379,8 @@ describe('語彙エンドポイント', () => {
     ['/heritage-types', FIXTURE_COUNTS.heritageTypes],
     ['/designation-categories', FIXTURE_COUNTS.designationCategories],
     ['/category-schemes', FIXTURE_COUNTS.categorySchemes],
+    ['/designation-criteria', FIXTURE_COUNTS.designationCriteria],
+    ['/detail-fields', FIXTURE_COUNTS.detailFields],
     ['/categories', FIXTURE_COUNTS.categories],
     ['/prefectures', FIXTURE_COUNTS.prefectures],
   ])('%s は %i 件を返す', async (path, total) => {
@@ -270,6 +403,32 @@ describe('語彙エンドポイント', () => {
     const { body } = await get<VocabularyResponse<{ name: string; count: number }>>('/prefectures')
 
     expect(body.data).toContainEqual({ name: '青森県', count: 1 })
+  })
+})
+
+describe('指定基準と記述項目の語彙', () => {
+  it('指定基準は紐づく文化財の件数を返す', async () => {
+    const { body } =
+      await get<VocabularyResponse<{ id: number; text: string; count: number }>>(
+        '/designation-criteria'
+      )
+
+    expect(body.data.find((c) => c.id === 1)).toMatchObject({
+      text: '(一）意匠的に優秀なもの',
+      count: 1,
+    })
+  })
+
+  it('記述項目は適用範囲と件数を返す', async () => {
+    const { body } =
+      await get<VocabularyResponse<{ code: string; appliesTo: string; count: number }>>(
+        '/detail-fields'
+      )
+
+    expect(body.data.find((f) => f.code === 'structure')).toMatchObject({
+      appliesTo: '建造物',
+      count: 1,
+    })
   })
 })
 
