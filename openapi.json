@@ -120,7 +120,7 @@
           "properties"
         ],
         "summary": "文化財の一覧",
-        "description": "文化財を検索する。件数は管理対象単位。",
+        "description": "文化財を検索",
         "responses": {
           "200": {
             "description": "検索結果",
@@ -139,6 +139,16 @@
                           },
                           "name": {
                             "type": "string"
+                          },
+                          "nameKana": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           },
                           "unitName": {
                             "anyOf": [
@@ -205,13 +215,24 @@
                                     "unknown"
                                   ],
                                   "type": "string"
+                                },
+                                "japaneseEraDate": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
                                 "code",
                                 "name",
                                 "designatedOn",
-                                "datePrecision"
+                                "datePrecision",
+                                "japaneseEraDate"
                               ]
                             }
                           },
@@ -247,6 +268,7 @@
                         "required": [
                           "id",
                           "name",
+                          "nameKana",
                           "unitName",
                           "heritageType",
                           "designations",
@@ -367,6 +389,15 @@
           },
           {
             "in": "query",
+            "name": "kana",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          {
+            "in": "query",
             "name": "heritageType",
             "schema": {
               "type": "string"
@@ -431,6 +462,13 @@
           },
           {
             "in": "query",
+            "name": "criterion",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
             "name": "designatedFrom",
             "schema": {
               "type": "string",
@@ -447,7 +485,36 @@
           },
           {
             "in": "query",
+            "name": "yearFrom",
+            "schema": {
+              "type": "integer",
+              "minimum": -9999,
+              "maximum": 9999
+            }
+          },
+          {
+            "in": "query",
+            "name": "yearTo",
+            "schema": {
+              "type": "integer",
+              "minimum": -9999,
+              "maximum": 9999
+            }
+          },
+          {
+            "in": "query",
             "name": "hasCoordinates",
+            "schema": {
+              "enum": [
+                "true",
+                "false"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hasDescription",
             "schema": {
               "enum": [
                 "true",
@@ -471,7 +538,9 @@
               "enum": [
                 "id",
                 "name",
-                "designatedOn"
+                "nameKana",
+                "designatedOn",
+                "year"
               ],
               "type": "string",
               "default": "id"
@@ -535,6 +604,16 @@
                         },
                         "name": {
                           "type": "string"
+                        },
+                        "nameKana": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "unitName": {
                           "anyOf": [
@@ -601,13 +680,24 @@
                                   "unknown"
                                 ],
                                 "type": "string"
+                              },
+                              "japaneseEraDate": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
                               }
                             },
                             "required": [
                               "code",
                               "name",
                               "designatedOn",
-                              "datePrecision"
+                              "datePrecision",
+                              "japaneseEraDate"
                             ]
                           }
                         },
@@ -639,6 +729,16 @@
                             }
                           ]
                         },
+                        "unitNameKana": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
                         "register": {
                           "type": "object",
                           "properties": {
@@ -656,6 +756,16 @@
                         },
                         "targetId": {
                           "type": "string"
+                        },
+                        "sourceUrl": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "period": {
                           "anyOf": [
@@ -698,6 +808,186 @@
                           ]
                         },
                         "coordinateNote": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "quantityText": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "eraText": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "yearText": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "yearFrom": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "yearTo": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "areaText": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "areaHectares": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "ownerKind": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "summaryText": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "detailText": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "hasPhoto": {
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "hasAttachment": {
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "designationNumber": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "branchNumber": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "notificationNumber": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "notifiedOn": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "addedOn": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "registrationRound": {
                           "anyOf": [
                             {
                               "type": "string"
@@ -799,26 +1089,249 @@
                               "name"
                             ]
                           }
+                        },
+                        "details": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "field": {
+                                "type": "object",
+                                "properties": {
+                                  "code": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "code",
+                                  "name"
+                                ]
+                              },
+                              "value": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "field",
+                              "value"
+                            ]
+                          }
+                        },
+                        "criteria": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "designation",
+                                  "registration",
+                                  "selection",
+                                  "selected"
+                                ],
+                                "type": "string"
+                              },
+                              "slot": {
+                                "type": "number"
+                              },
+                              "text": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "kind",
+                              "slot",
+                              "text"
+                            ]
+                          }
+                        },
+                        "attachments": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "quantityText": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "quantityText"
+                            ]
+                          }
+                        },
+                        "holders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "enum": [
+                                  "individual",
+                                  "group"
+                                ],
+                                "type": "string"
+                              },
+                              "name": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "nameKana": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "certifiedOn": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "certificationRound": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "name",
+                              "nameKana",
+                              "certifiedOn",
+                              "certificationRound"
+                            ]
+                          }
+                        },
+                        "changes": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "changedOn": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "datePrecision": {
+                                "enum": [
+                                  "day",
+                                  "month",
+                                  "unknown"
+                                ],
+                                "type": "string"
+                              },
+                              "types": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "content": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "changedOn",
+                              "datePrecision",
+                              "types",
+                              "content"
+                            ]
+                          }
                         }
                       },
                       "required": [
                         "id",
                         "name",
+                        "nameKana",
                         "unitName",
                         "heritageType",
                         "designations",
                         "prefectures",
                         "coordinates",
+                        "unitNameKana",
                         "register",
                         "targetId",
+                        "sourceUrl",
                         "period",
                         "originCountry",
                         "facilityName",
                         "locationText",
                         "coordinateNote",
+                        "quantityText",
+                        "eraText",
+                        "yearText",
+                        "yearFrom",
+                        "yearTo",
+                        "areaText",
+                        "areaHectares",
+                        "ownerKind",
+                        "summaryText",
+                        "detailText",
+                        "hasPhoto",
+                        "hasAttachment",
+                        "designationNumber",
+                        "branchNumber",
+                        "notificationNumber",
+                        "notifiedOn",
+                        "addedOn",
+                        "registrationRound",
                         "categories",
                         "places",
-                        "actors"
+                        "actors",
+                        "details",
+                        "criteria",
+                        "attachments",
+                        "holders",
+                        "changes"
                       ]
                     },
                     "meta": {
@@ -1345,6 +1858,212 @@
                         },
                         "required": [
                           "name",
+                          "count"
+                        ]
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "publisher": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            },
+                            "termsUrl": {
+                              "type": "string"
+                            },
+                            "license": {
+                              "type": "string"
+                            },
+                            "retrievedOn": {
+                              "type": "string"
+                            },
+                            "note": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "publisher",
+                            "url",
+                            "termsUrl",
+                            "license",
+                            "retrievedOn",
+                            "note"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "source"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/designation-criteria": {
+      "get": {
+        "operationId": "getDesignationCriteria",
+        "tags": [
+          "vocabularies"
+        ],
+        "summary": "指定・登録・選択・選定基準の一覧",
+        "responses": {
+          "200": {
+            "description": "指定・登録・選択・選定基準の一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "kind": {
+                            "enum": [
+                              "designation",
+                              "registration",
+                              "selection",
+                              "selected"
+                            ],
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          },
+                          "count": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "text",
+                          "count"
+                        ]
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "publisher": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            },
+                            "termsUrl": {
+                              "type": "string"
+                            },
+                            "license": {
+                              "type": "string"
+                            },
+                            "retrievedOn": {
+                              "type": "string"
+                            },
+                            "note": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "publisher",
+                            "url",
+                            "termsUrl",
+                            "license",
+                            "retrievedOn",
+                            "note"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "source"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/detail-fields": {
+      "get": {
+        "operationId": "getDetailFields",
+        "tags": [
+          "vocabularies"
+        ],
+        "summary": "文化財種類ごとの記述項目の一覧",
+        "responses": {
+          "200": {
+            "description": "文化財種類ごとの記述項目の一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "appliesTo": {
+                            "type": "string"
+                          },
+                          "count": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "name",
+                          "appliesTo",
                           "count"
                         ]
                       }

@@ -157,22 +157,28 @@ make db                          # ローカル D1 を作り直して投入
 
 `openapi.json` は `src/` のスキーマから生成し、リポジトリにコミットする。ルートを変更したら `pnpm openapi:generate` を実行する。
 
-| エンドポイント                | 内容                   |
-| ----------------------------- | ---------------------- |
-| `GET /`                       | API の情報と出典       |
-| `GET /openapi.json`           | OpenAPI 仕様           |
-| `GET /docs`                   | Swagger UI             |
-| `GET /reference`              | Scalar                 |
-| `GET /properties`             | 文化財の一覧           |
-| `GET /properties/:id`         | 文化財の詳細           |
-| `GET /registers`              | 台帳                   |
-| `GET /heritage-types`         | 文化財種類             |
-| `GET /designation-categories` | 指定・登録区分         |
-| `GET /category-schemes`       | 分類体系               |
-| `GET /categories`             | 分類語彙               |
-| `GET /prefectures`            | 所在地の都道府県と件数 |
+| エンドポイント                | 内容                       |
+| ----------------------------- | -------------------------- |
+| `GET /`                       | API の情報と出典           |
+| `GET /openapi.json`           | OpenAPI 仕様               |
+| `GET /docs`                   | Swagger UI                 |
+| `GET /reference`              | Scalar                     |
+| `GET /properties`             | 文化財の一覧               |
+| `GET /properties/:id`         | 文化財の詳細               |
+| `GET /registers`              | 台帳                       |
+| `GET /heritage-types`         | 文化財種類                 |
+| `GET /designation-categories` | 指定・登録区分             |
+| `GET /designation-criteria`   | 指定・登録・選択・選定基準 |
+| `GET /category-schemes`       | 分類体系                   |
+| `GET /categories`             | 分類語彙                   |
+| `GET /detail-fields`          | 文化財種類ごとの記述項目   |
+| `GET /prefectures`            | 所在地の都道府県と件数     |
 
 件数は管理対象（棟・個体）単位。指定単位の件数は元データに識別子がないため提供しない。所在地の絞り込みは都道府県のみ。
+
+`q` は名称・ふりがな・解説文を対象とした FTS5 の全文検索。日本語のため trigram を使っており 3 文字以上でないと一致しないため、2 文字以下は名称とふりがなの部分一致に切り替わる。
+
+`sort` に `nameKana` と `year` を指定した場合、値を持たない文化財は昇順・降順いずれでも末尾に並ぶ。
 
 ### データベース操作
 
