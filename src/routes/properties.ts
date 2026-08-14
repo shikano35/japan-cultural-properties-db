@@ -20,8 +20,7 @@ propertyRoutes.get(
   describeRoute({
     tags: ['properties'],
     summary: '文化財の一覧',
-    description:
-      '文化財を検索',
+    description: '文化財を検索',
     responses: {
       200: {
         description: '検索結果',
